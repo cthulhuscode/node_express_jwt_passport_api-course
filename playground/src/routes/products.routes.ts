@@ -7,7 +7,7 @@ import {
   patchProduct,
   deleteProduct,
 } from "../controllers/products.controller";
-import { validatorHandler } from "../middlewares/validatorHandler";
+import { validatorHandler } from "../middlewares/validator.handler";
 import {
   createProductSchema,
   updateProductSchema,

@@ -15,7 +15,7 @@ import {
   deleteOrderSchema,
   addItemSchema,
 } from "../schemas/orders.schemas";
-import { validatorHandler } from "../middlewares/validatorHandler";
+import { validatorHandler } from "../middlewares/validator.handler";
 import { queryProductSchema } from "../schemas/products.schemas";
 
 export const router = Router();

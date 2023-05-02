@@ -12,7 +12,7 @@ import {
   getCategorySchema,
   updateCategorySchema,
 } from "../schemas/categories.schemas";
-import { validatorHandler } from "../middlewares/validatorHandler";
+import { validatorHandler } from "../middlewares/validator.handler";
 
 export const router = Router();
 

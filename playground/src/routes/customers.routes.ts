@@ -6,7 +6,7 @@ import {
   getCustomers,
   updateCustomer,
 } from "../controllers/customers.controller";
-import { validatorHandler } from "../middlewares/validatorHandler";
+import { validatorHandler } from "../middlewares/validator.handler";
 import {
   createCustomerSchema,
   deleteCustomerSchema,

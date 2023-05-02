@@ -6,7 +6,7 @@ import {
   getUsers,
   updateUser,
 } from "../controllers/users.controller";
-import { validatorHandler } from "../middlewares/validatorHandler";
+import { validatorHandler } from "../middlewares/validator.handler";
 import {
   createUserSchema,
   deleteUserSchema,
