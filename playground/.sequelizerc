@@ -1,0 +1,25 @@
+/**
+ * Indicar dónde se encontrará la configuración.
+ * En dicha configuración se indicará cuál es
+ * la conexión hacia la base de datos.
+ *
+ * El cli o migraciones tendrán su propia conexión
+ * independientemente de la conexión que ya tiene la
+ * aplicación.
+ * */
+
+var path = require("path");
+
+module.exports = {
+  config: path.resolve(".", "dist", "src", "db", "config.js"),
+  "models-path": path.resolve(".", "dist", "src", "db", "models"),
+  "migrations-path": path.resolve(".", "dist", "src", "db", "migrations"),
+  "seeders-path": path.resolve(".", "dist", "src", "db", "seeders"),
+};
+
+// module.exports = {
+//   config: path.resolve(".", "src", "db", "config.js"),
+//   "models-path": path.resolve(".", "src", "db", "models"),
+//   "migrations-path": path.resolve(".", "src", "db", "migrations"),
+//   "seeders-path": path.resolve(".", "src", "db", "seeders"),
+// };
