@@ -52,17 +52,16 @@ export class User extends Model {
           user.password = encryptedPassword;
         },
       },
+      defaultScope: {
+        attributes: {
+          exclude: ["password"],
+        },
+      },
       scopes: {
-        withoutPassword: {
-          attributes: { exclude: ["password"] },
+        withPassword: {
+          attributes: ["id", "email", "password", "role", "createdAt"],
         },
       },
     };
   }
 }
-
-// Hooks
-// User.beforeCreate(async (user: any, options: any) => {
-//   const encryptedPassword = await hashPassword(user.password);
-//   user.password = encryptedPassword;
-// });

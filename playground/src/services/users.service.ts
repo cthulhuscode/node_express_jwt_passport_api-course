@@ -8,7 +8,7 @@ const {
 
 export class UsersService {
   async find() {
-    const response = await User.scope("withoutPassword").findAll({
+    const response = await User.findAll({
       include: "customer",
     });
 
@@ -20,7 +20,7 @@ export class UsersService {
   async findOne(id: number) {
     if (!id) throw boom.badRequest("Invalid id.");
 
-    const response = await User.scope("withoutPassword").findByPk(id, {
+    const response = await User.findByPk(id, {
       include: "customer",
     });
 
