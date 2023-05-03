@@ -1,6 +1,7 @@
 import boom from "@hapi/boom";
 import { sequelize } from "../libs";
 import { IUser } from "../interfaces";
+import { hashPassword } from "../utils/bcrypt";
 const {
   models: { User },
 } = sequelize;
@@ -28,10 +29,14 @@ export class UsersService {
     return response;
   }
   async create(data: Partial<IUser>) {
-    const newUser = await User.create(data);
+    const encryptedPassword = await hashPassword(data.password!);
+
+    const newUser = await User.create({ ...data, password: encryptedPassword });
 
     if (!newUser)
       throw boom.internal("An error ocurred while creating the user");
+
+    delete newUser.dataValues.password;
 
     return newUser;
   }

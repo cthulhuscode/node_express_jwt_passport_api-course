@@ -1,6 +1,7 @@
 import boom from "@hapi/boom";
 import { sequelize } from "../libs";
 import { ICustomer, IUser } from "../interfaces";
+import { hashPassword } from "../utils/bcrypt";
 const {
   models: { Customer, User },
 } = sequelize;
@@ -33,18 +34,26 @@ export class CustomersService {
     return response;
   }
   async create(data: Partial<ICustomer> | any) {
+    const password = data.user.password;
+    const encryptedPassword = await hashPassword(password);
+
     /**
      * Thanks to the associations is possible to create
      * new rows even for associated tables. For example,
      * create a new user for a new client.
      * This endpoint creates a new customer and a new user.
      */
-    const newCustomer: any = await Customer.create(data, {
-      include: ["user"],
-    });
+    const newCustomer: any = await Customer.create(
+      { ...data, user: { ...data.user, password: encryptedPassword } },
+      {
+        include: ["user"],
+      }
+    );
 
     if (!newCustomer)
       throw boom.internal("An error ocurred while creating the customer");
+
+    delete newCustomer.dataValues.user.dataValues.password;
 
     return newCustomer;
   }
