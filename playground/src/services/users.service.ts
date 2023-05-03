@@ -1,7 +1,7 @@
 import boom from "@hapi/boom";
 import { sequelize } from "../libs";
 import { IUser } from "../interfaces";
-import { hashPassword } from "../utils/bcrypt";
+
 const {
   models: { User },
 } = sequelize;
@@ -28,6 +28,20 @@ export class UsersService {
 
     return response;
   }
+
+  async findByEmail(email: string) {
+    if (!email) throw boom.badRequest("Invalid email.");
+
+    const response = await User.scope("withPassword").findOne({
+      where: { email },
+      include: ["customer"],
+    });
+
+    if (!response) throw boom.notFound("The user wasn't found.");
+
+    return response;
+  }
+
   async create(data: Partial<IUser>) {
     const newUser = await User.create(data);
 
