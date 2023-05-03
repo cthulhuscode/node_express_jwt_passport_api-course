@@ -29,9 +29,7 @@ export class UsersService {
     return response;
   }
   async create(data: Partial<IUser>) {
-    const encryptedPassword = await hashPassword(data.password!);
-
-    const newUser = await User.create({ ...data, password: encryptedPassword });
+    const newUser = await User.create(data);
 
     if (!newUser)
       throw boom.internal("An error ocurred while creating the user");

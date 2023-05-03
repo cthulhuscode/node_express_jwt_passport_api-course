@@ -1,4 +1,5 @@
 import { Model, DataTypes, Sequelize, NOW } from "sequelize";
+import { hashPassword } from "../../utils/bcrypt";
 
 export const USER_TABLE = "users";
 
@@ -45,6 +46,12 @@ export class User extends Model {
       tableName: USER_TABLE,
       modelName: "User",
       timestamps: false,
+      hooks: {
+        beforeCreate: async (user: any, options: any) => {
+          const encryptedPassword = await hashPassword(user.password);
+          user.password = encryptedPassword;
+        },
+      },
       scopes: {
         withoutPassword: {
           attributes: { exclude: ["password"] },
@@ -53,3 +60,9 @@ export class User extends Model {
     };
   }
 }
+
+// Hooks
+// User.beforeCreate(async (user: any, options: any) => {
+//   const encryptedPassword = await hashPassword(user.password);
+//   user.password = encryptedPassword;
+// });
