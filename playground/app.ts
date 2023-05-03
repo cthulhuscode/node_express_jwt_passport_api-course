@@ -3,7 +3,7 @@ import "express-async-errors";
 import cors from "cors";
 import { corsOptions } from "./src/utils/corsOptions";
 import { router } from "./src/routes";
-import { errorHandler } from "./src/middlewares/errorHandler";
+import { errorHandler } from "./src/middlewares/error.handler";
 
 const PORT = process.env.PORT || 3000;
 
