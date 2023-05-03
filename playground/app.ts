@@ -5,6 +5,9 @@ import { corsOptions } from "./src/utils/corsOptions";
 import { router } from "./src/routes";
 import { errorHandler } from "./src/middlewares/error.handler";
 
+// Initialize passport
+import "./src/utils/auth";
+
 const PORT = process.env.PORT || 3000;
 
 const app = express();
