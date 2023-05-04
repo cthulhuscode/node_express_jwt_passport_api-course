@@ -13,7 +13,7 @@ import {
   getCategorySchema,
   updateCategorySchema,
 } from "../schemas/categories.schemas";
-import { validatorHandler, checkAdminRole, checkRoles } from "../middlewares";
+import { validatorHandler, checkRoles } from "../middlewares";
 import { Roles } from "../utils/roles";
 
 export const router = Router();
