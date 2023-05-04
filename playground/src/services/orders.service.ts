@@ -56,8 +56,32 @@ export class OrdersService {
     return order;
   }
 
-  async create(order: Omit<IOrder, "id">) {
-    const newOrder = await Order.create(order);
+  async findByUser(userId: number) {
+    const orders = await Order.findAll({
+      where: { "$customer.user.id$": userId }, // Filtrate by columns in associations customer -> user . id
+      include: [
+        {
+          association: "customer",
+          include: [
+            {
+              association: "user",
+              model: User,
+              as: "user",
+              attributes: ["id", "email", "role", "createdAt"],
+            },
+          ],
+        },
+        "items",
+      ],
+    });
+
+    if (!orders) throw boom.notFound("No orders were found.");
+
+    return orders;
+  }
+
+  async create(customerId: number) {
+    const newOrder = await Order.create({ customerId });
 
     if (!newOrder)
       throw boom.internal(
