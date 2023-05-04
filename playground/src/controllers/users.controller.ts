@@ -15,6 +15,17 @@ export const getUser = async (req: Request, res: Response) => {
   res.status(200).json({ user });
 };
 
+export const getAuthenticatedUser = async (req: Request, res: Response) => {
+  const user: any = req.user;
+
+  if (user.sub) {
+    const authUser = await service.findOne(+user.sub);
+    res.status(200).json({ user: authUser });
+  }
+
+  res.status(200).json({ msg: "There is currently no authenticated user." });
+};
+
 export const createUser = async (req: Request, res: Response) => {
   const user = await service.create(req.body);
   res.status(201).json({ user });
@@ -27,7 +38,5 @@ export const updateUser = async (req: Request, res: Response) => {
 
 export const deleteUser = async (req: Request, res: Response) => {
   const id = await service.delete(+req.params.id);
-  res
-    .status(200)
-    .json({ message: `The user ${id} was deleted successfully.` });
+  res.status(200).json({ message: `The user ${id} was deleted successfully.` });
 };
