@@ -13,6 +13,7 @@ import {
   updateCategorySchema,
 } from "../schemas/categories.schemas";
 import { validatorHandler } from "../middlewares/validator.handler";
+import passport from "passport";
 
 export const router = Router();
 
@@ -29,5 +30,10 @@ router.delete(
   deleteCategory
 );
 
-router.post("/", validatorHandler(createCategorySchema, "body"), addCategory);
+router.post(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  validatorHandler(createCategorySchema, "body"),
+  addCategory
+);
 router.get("/", getCategories);
