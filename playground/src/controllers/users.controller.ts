@@ -18,12 +18,12 @@ export const getUser = async (req: Request, res: Response) => {
 export const getAuthenticatedUser = async (req: Request, res: Response) => {
   const user: any = req.user;
 
-  if (user.sub) {
-    const authUser = await service.findOne(+user.sub);
+  if (user.sub.userId) {
+    const authUser = await service.findOne(+user.sub.userId);
     res.status(200).json({ user: authUser });
   }
 
-  res.status(200).json({ msg: "There is currently no authenticated user." });
+  res.status(401).json({ msg: "There is currently no authenticated user." });
 };
 
 export const createUser = async (req: Request, res: Response) => {
