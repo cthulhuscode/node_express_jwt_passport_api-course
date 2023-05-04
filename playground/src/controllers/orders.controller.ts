@@ -21,8 +21,14 @@ export const getOrder = async (req: Request, res: Response) => {
 };
 
 export const addOrder = async (req: Request, res: Response) => {
-  const newOrder = await service.create(req.body);
-  res.status(201).json({ order: newOrder, msg: "Order created" });
+  const user: any = req.user;
+
+  if (user.sub.customerId) {
+    const newOrder = await service.create(user.sub.customerId);
+    return res.status(201).json({ order: newOrder, msg: "Order created" });
+  }
+
+  res.status(401).json({ msg: "Please log in to create an order." });
 };
 
 export const addProduct = async (req: Request, res: Response) => {

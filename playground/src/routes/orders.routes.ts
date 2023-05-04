@@ -9,7 +9,6 @@ import {
   addProduct,
 } from "../controllers/orders.controller";
 import {
-  createOrderSchema,
   getOrderSchema,
   updateOrderSchema,
   deleteOrderSchema,
@@ -50,10 +49,6 @@ router.delete(
   deleteOrder
 );
 
-router.post(
-  "/",
-  passport.authenticate("jwt", { session: false }),
-  validatorHandler(createOrderSchema, "body"),
-  addOrder
-);
+router.post("/", passport.authenticate("jwt", { session: false }), addOrder);
+
 router.get("/", validatorHandler(queryProductSchema, "query"), getOrders);
