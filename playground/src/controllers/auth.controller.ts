@@ -6,9 +6,10 @@ export const login = async (req: Request, res: Response) => {
 
   // Generate tokenx
   const payload = {
-    sub: user.id,
+    sub: { userId: user.id, customerId: user.customer.id },
     role: user.role,
   };
+
   const token = signToken(payload);
 
   res.status(200).json({ user, token });
