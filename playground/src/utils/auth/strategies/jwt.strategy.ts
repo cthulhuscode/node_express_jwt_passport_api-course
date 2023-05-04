@@ -12,11 +12,5 @@ const options = {
 };
 
 export const JwtStrategy = new Strategy(options, (payload, done) => {
-  if (!payload)
-    done(
-      boom.unauthorized("You don't have permission to access to this route"),
-      false
-    );
-
   return done(null, payload);
 });
