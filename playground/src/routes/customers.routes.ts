@@ -13,24 +13,31 @@ import {
   getCustomerSchema,
   updateCustomerSchema,
 } from "../schemas/customer.schemas";
+import passport from "passport";
 
 export const router = Router();
 
 router.get("/:id", validatorHandler(getCustomerSchema, "params"), getCustomer);
+
 router.delete(
   "/:id",
+  passport.authenticate("jwt", { session: false }),
   validatorHandler(deleteCustomerSchema, "params"),
   deleteCustomer
 );
+
 router.put(
   "/:id",
+  passport.authenticate("jwt", { session: false }),
   validatorHandler(getCustomerSchema, "params"),
   validatorHandler(updateCustomerSchema, "body"),
   updateCustomer
 );
-router.get("/", getCustomers);
+
 router.post(
   "/",
   validatorHandler(createCustomerSchema, "body"),
   createCustomer
 );
+
+router.get("/", getCustomers);

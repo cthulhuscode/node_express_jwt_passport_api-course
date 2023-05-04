@@ -1,3 +1,4 @@
+import passport from "passport";
 import { Router } from "express";
 import {
   getCategories,
@@ -12,20 +13,38 @@ import {
   getCategorySchema,
   updateCategorySchema,
 } from "../schemas/categories.schemas";
-import { validatorHandler } from "../middlewares/validator.handler";
-import passport from "passport";
+import { validatorHandler, checkAdminRole, checkRoles } from "../middlewares";
+import { Roles } from "../utils/roles";
 
 export const router = Router();
 
-router.get("/:id", validatorHandler(getCategorySchema, "params"), getCategory);
-router.put("/:id", validatorHandler(updateCategorySchema, "body"), putCategory);
+router.get(
+  "/:id",
+  checkRoles(Roles.Admin, Roles.Customer),
+  validatorHandler(getCategorySchema, "params"),
+  getCategory
+);
+
+router.put(
+  "/:id",
+  passport.authenticate("jwt", { session: false }),
+  checkRoles(Roles.Admin),
+  validatorHandler(updateCategorySchema, "body"),
+  putCategory
+);
+
 router.patch(
   "/:id",
+  passport.authenticate("jwt", { session: false }),
+  checkRoles(Roles.Admin),
   validatorHandler(updateCategorySchema, "body"),
   patchCategory
 );
+
 router.delete(
   "/:id",
+  passport.authenticate("jwt", { session: false }),
+  checkRoles(Roles.Admin),
   validatorHandler(getCategorySchema, "params"),
   deleteCategory
 );
@@ -33,6 +52,7 @@ router.delete(
 router.post(
   "/",
   passport.authenticate("jwt", { session: false }),
+  checkRoles(Roles.Admin),
   validatorHandler(createCategorySchema, "body"),
   addCategory
 );

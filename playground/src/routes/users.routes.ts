@@ -13,16 +13,27 @@ import {
   getUserSchema,
   updateUserSchema,
 } from "../schemas/users.schemas";
+import passport from "passport";
 
 export const router = Router();
 
 router.get("/:id", validatorHandler(getUserSchema, "params"), getUser);
-router.delete("/:id", validatorHandler(deleteUserSchema, "params"), deleteUser);
+
+router.delete(
+  "/:id",
+  passport.authenticate("jwt", { session: false }),
+  validatorHandler(deleteUserSchema, "params"),
+  deleteUser
+);
+
 router.put(
   "/:id",
+  passport.authenticate("jwt", { session: false }),
   validatorHandler(getUserSchema, "params"),
   validatorHandler(updateUserSchema, "body"),
   updateUser
 );
-router.get("/", getUsers);
+
 router.post("/", validatorHandler(createUserSchema, "body"), createUser);
+
+router.get("/", getUsers);

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { login } from "../controllers/auth.controller";
 import passport from "passport";
+import { getAuthenticatedUser } from "../controllers/users.controller";
 
 export const router = Router();
 
@@ -13,4 +14,9 @@ router.post(
   "/login",
   passport.authenticate("local", { session: false }),
   login
+);
+router.get(
+  "/user",
+  passport.authenticate("jwt", { session: false }),
+  getAuthenticatedUser
 );
