@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login } from "../controllers/auth.controller";
+import { login, recover } from "../controllers/auth.controller";
 import passport from "passport";
 import { getAuthenticatedUser } from "../controllers/users.controller";
 
@@ -15,6 +15,9 @@ router.post(
   passport.authenticate("local", { session: false }),
   login
 );
+
+router.post("/recovery", recover);
+
 router.get(
   "/user",
   passport.authenticate("jwt", { session: false }),

@@ -1,16 +1,26 @@
 import { Request, Response } from "express";
-import { signToken } from "../utils/jwt";
+import { AuthService } from "../services/auth.service";
+
+const service = new AuthService();
 
 export const login = async (req: Request, res: Response) => {
-  const user: any = req.user!;
+  let user: any = req.user!;
 
-  // Generate tokenx
-  const payload = {
-    sub: { userId: user.id, customerId: user.customer.id },
+  user = {
+    userId: user.sub.userId,
+    customerId: user.sub.customerId,
     role: user.role,
   };
 
-  const token = signToken(payload);
+  const data = service.signToken(user);
 
-  res.status(200).json({ user, token });
+  res.status(200).json({ ...data });
+};
+
+export const recover = async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  const response = await service.sendEmail(email);
+
+  res.status(200).json({ ...response });
 };
