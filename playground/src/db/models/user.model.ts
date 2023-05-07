@@ -59,12 +59,15 @@ export class User extends Model {
       },
       defaultScope: {
         attributes: {
-          exclude: ["password"],
+          exclude: ["password", "recoveryToken"],
         },
       },
       scopes: {
         withPassword: {
           attributes: ["id", "email", "password", "role", "createdAt"],
+        },
+        withRecoveryToken: {
+          attributes: ["id", "email", "recoveryToken", "role", "createdAt"],
         },
       },
     };
