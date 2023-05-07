@@ -7,8 +7,8 @@ export const login = async (req: Request, res: Response) => {
   let user: any = req.user!;
 
   user = {
-    userId: user.sub.userId,
-    customerId: user.sub.customerId,
+    userId: user.id,
+    customerId: user.customer.id,
     role: user.role,
   };
 
