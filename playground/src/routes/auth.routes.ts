@@ -1,7 +1,13 @@
 import { Router } from "express";
-import { login, recover } from "../controllers/auth.controller";
+import {
+  changePassword,
+  login,
+  recoverAccount,
+} from "../controllers/auth.controller";
 import passport from "passport";
 import { getAuthenticatedUser } from "../controllers/users.controller";
+import { validatorHandler } from "../middlewares";
+import { changePasswordSchema } from "../schemas/auth.schemas";
 
 export const router = Router();
 
@@ -16,7 +22,13 @@ router.post(
   login
 );
 
-router.post("/recovery", recover);
+router.post("/recovery", recoverAccount);
+
+router.post(
+  "/change-password",
+  validatorHandler(changePasswordSchema, "body"),
+  changePassword
+);
 
 router.get(
   "/user",

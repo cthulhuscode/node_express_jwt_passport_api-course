@@ -4,14 +4,19 @@ import jwt from "jsonwebtoken";
 import { UsersService } from "./users.service";
 import { verifyPassword } from "../utils/bcrypt";
 import { Roles } from "../utils/roles";
-import { signToken } from "../utils/jwt";
+import { signToken, verifyToken } from "../utils/jwt";
 import { config } from "../config";
+import { hashPassword } from "../utils/bcrypt";
+import { sequelize } from "../libs";
 
-const service = new UsersService();
+const userService = new UsersService();
+const {
+  models: { User },
+} = sequelize;
 
 export class AuthService {
   async handleLogin(email: string, password: string) {
-    const user = await service.findByEmail(email);
+    const user = await userService.findByEmail(email);
 
     if (!user) throw boom.unauthorized("Email or password incorrect.");
 
@@ -28,7 +33,7 @@ export class AuthService {
     return user;
   }
 
-  signToken(user: { userId: number; customerId: number; role: typeof Roles }) {
+  signToken(user: { userId: number; customerId: number | null; role: typeof Roles }) {
     const { userId, customerId, role } = user;
 
     // Generate tokenx
@@ -46,7 +51,7 @@ export class AuthService {
   }
 
   async sendPasswordRecovery(emailAddress: string) {
-    const user: any = await service.findByEmail(emailAddress);
+    const user: any = await userService.findByEmail(emailAddress);
 
     if (!user) throw boom.unauthorized("Invalid email.");
 
@@ -55,18 +60,18 @@ export class AuthService {
     };
 
     // Token expires in 15 minutes
-    const token = jwt.sign(payload, config.jwtSecret!, {
+    const token = jwt.sign(payload, config.recoveryJwtSecret!, {
       expiresIn: "15min",
     });
-    const url = `http://myfrontend.com/recovery?token=${token}`;
-    await service.update(user.id, { recoveryToken: token });
+    const url = `http://localhost:3000/recovery?token=${token}`;
+    await userService.update(user.id, { recoveryToken: token });
 
     const emailDetails = {
       from: config.emailFrom, // sender address
       to: emailAddress, // list of receivers
       subject: "Recover your account's password", // Subject line
-      html: `<h3>Click the link below to recover your password.</h3>
-        <br><br>
+      html: `<h3>Click the link below to create a new password</h3>
+        <br><p>Note: the token will expire in 15 minutes.</p><br>
         <p>${url}</p>`, // html body
     };
 
@@ -76,7 +81,7 @@ export class AuthService {
   }
 
   async sendEmail(email: any) {
-    const user: any = await service.findByEmail(email);
+    const user: any = await userService.findByEmail(email.to);
 
     if (!user) throw boom.unauthorized("Not authorized.");
 
@@ -101,6 +106,33 @@ export class AuthService {
 
     return {
       msg: "Email sent successfully.",
+    };
+  }
+
+  async changePassword(newPassword: string, token: string) {
+    // Get the userId
+    const payload: any = verifyToken(token);
+
+    // Find the user
+    const user: any = await User.scope("withRecoveryToken").findByPk(
+      payload.sub.userId,
+      {
+        include: "customer",
+      }
+    );
+
+    // Verify token is correct
+    if (user.recoveryToken !== token) throw boom.unauthorized("Invalid token.");
+
+    const hashedPassword = await hashPassword(newPassword);
+
+    await userService.update(user.id, {
+      recoveryToken: null!,
+      password: hashedPassword,
+    });
+
+    return {
+      msg: "Password changed successfully!",
     };
   }
 }
