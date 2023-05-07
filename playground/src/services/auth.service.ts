@@ -1,5 +1,6 @@
 import boom from "@hapi/boom";
 import nodemailer from "nodemailer";
+import jwt from "jsonwebtoken";
 import { UsersService } from "./users.service";
 import { verifyPassword } from "../utils/bcrypt";
 import { Roles } from "../utils/roles";
@@ -44,7 +45,37 @@ export class AuthService {
     };
   }
 
-  async sendEmail(email: string) {
+  async sendPasswordRecovery(emailAddress: string) {
+    const user: any = await service.findByEmail(emailAddress);
+
+    if (!user) throw boom.unauthorized("Invalid email.");
+
+    const payload = {
+      sub: { userId: user.id, customerId: user.customer.id },
+    };
+
+    // Token expires in 15 minutes
+    const token = jwt.sign(payload, config.jwtSecret!, {
+      expiresIn: "15min",
+    });
+    const url = `http://myfrontend.com/recovery?token=${token}`;
+    await service.update(user.id, { recoveryToken: token });
+
+    const emailDetails = {
+      from: config.emailFrom, // sender address
+      to: emailAddress, // list of receivers
+      subject: "Recover your account's password", // Subject line
+      html: `<h3>Click the link below to recover your password.</h3>
+        <br><br>
+        <p>${url}</p>`, // html body
+    };
+
+    const res = await this.sendEmail(emailDetails);
+
+    return res;
+  }
+
+  async sendEmail(email: any) {
     const user: any = await service.findByEmail(email);
 
     if (!user) throw boom.unauthorized("Not authorized.");
@@ -61,13 +92,7 @@ export class AuthService {
       },
     });
 
-    const info = await transporter.sendMail({
-      from: config.emailFrom, // sender address
-      to: user.email, // list of receivers
-      subject: "Testing email sending from Nodemailer", // Subject line
-      text: "Testing this out", // plain text body
-      html: "<h1>Greetings from Cthulhu xD</h1>", // html body
-    });
+    const info = await transporter.sendMail(email);
 
     if (!info.accepted.length || info.rejected.length)
       throw boom.internal(
