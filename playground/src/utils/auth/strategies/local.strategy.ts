@@ -8,10 +8,18 @@ export const LocalStrategy = new Strategy(
   {
     usernameField: "email",
   },
-  async (email, password, done) => {
-    const user = await service.handleLogin(email, password);
+  async (email, password, cb) => {
+    try {
+      const user = await service.handleLogin(email, password);
 
-    // User is added to the request
-    done(null, user);
+      // Invalid credentials
+      if (!user) cb(null, false);
+
+      // User is added to the request
+      cb(null, user);
+    } catch (error) {
+      // Send error
+      cb(error);
+    }
   }
 );
