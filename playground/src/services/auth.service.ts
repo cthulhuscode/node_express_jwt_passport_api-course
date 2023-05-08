@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { UsersService } from "./users.service";
 import { verifyPassword } from "../utils/bcrypt";
 import { Roles } from "../utils/roles";
-import { signToken, verifyToken } from "../utils/jwt";
+import { signToken, verifyRecoveryToken } from "../utils/jwt";
 import { config } from "../config";
 import { hashPassword } from "../utils/bcrypt";
 import { sequelize } from "../libs";
@@ -33,7 +33,11 @@ export class AuthService {
     return user;
   }
 
-  signToken(user: { userId: number; customerId: number | null; role: typeof Roles }) {
+  signToken(user: {
+    userId: number;
+    customerId: number | null;
+    role: typeof Roles;
+  }) {
     const { userId, customerId, role } = user;
 
     // Generate tokenx
@@ -51,9 +55,21 @@ export class AuthService {
   }
 
   async sendPasswordRecovery(emailAddress: string) {
-    const user: any = await userService.findByEmail(emailAddress);
+    const user: any = await User.scope("withRecoveryToken").findOne({
+      where: { email: emailAddress },
+      include: ["customer"],
+    });
 
     if (!user) throw boom.unauthorized("Invalid email.");
+
+    if (user.recoveryToken) {
+      const isTokenValid = verifyRecoveryToken(user.recoveryToken);
+
+      if (isTokenValid)
+        throw boom.unauthorized(
+          "You must wait 15 minutes before requesting an account recovery."
+        );
+    }
 
     const payload = {
       sub: { userId: user.id, customerId: user.customer.id },
@@ -111,7 +127,7 @@ export class AuthService {
 
   async changePassword(newPassword: string, token: string) {
     // Get the userId
-    const payload: any = verifyToken(token);
+    const payload: any = verifyRecoveryToken(token);
 
     // Find the user
     const user: any = await User.scope("withRecoveryToken").findByPk(
