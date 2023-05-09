@@ -8,7 +8,7 @@ import { errorHandler } from "./src/middlewares/error.handler";
 // Initialize passport
 import "./src/utils/auth";
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 const app = express();
 
